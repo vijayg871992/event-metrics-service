@@ -2,6 +2,8 @@ import Fastify from 'fastify';
 import pino from 'pino';
 import { connectDB } from './config/db';
 import { adminAuth } from './middleware/auth';
+import uploadRoutes from './routes/uploads';
+import multipart from '@fastify/multipart';
 
 async function startServer() {
   try {
@@ -22,6 +24,10 @@ async function startServer() {
     app.get('/secure', { preHandler: adminAuth }, async () => {
     return { message: 'Secure route accessed ✅' };
     });
+
+    await app.register(multipart);
+    
+    app.register(uploadRoutes, { prefix: '/uploads' });
 
     // Health check route
     app.get('/health', async () => {

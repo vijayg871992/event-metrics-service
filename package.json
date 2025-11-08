@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fastify/multipart": "^9.3.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.63.0",
     "csv-parser": "^3.2.0",
