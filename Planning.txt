@@ -1,0 +1,20 @@
+Event Metrics Service
+Part 1 – Core Setup + Upload
+
+Set up Fastify + TypeScript + MongoDB + Redis.
+Add auth middleware, CSV validation, and /uploads API.
+Store events in DB with processed:false, add 24-hour auto-cleanup job.
+
+
+Part 2 – Queue + Processing Logic
+
+Integrate BullMQ for background jobs.
+Add /batches/:id/process endpoint.
+Worker processes events, computes daily metrics, saves to DailyMetrics & DailyAggregate, with retries and DLQ.
+
+
+Part 3 – Final Touches + Metrics & Admin
+
+Add /metrics and /queues/:name/dlq APIs.
+Integrate logging (Pino), health check, Swagger docs, and minimal tests.
+Finalize README + architecture summary for submission.
