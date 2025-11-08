@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import pino from 'pino';
 import { connectDB } from './config/db';
+import { adminAuth } from './middleware/auth';
 
 async function startServer() {
   try {
@@ -17,6 +18,10 @@ async function startServer() {
     // Connect to MongoDB
     await connectDB();
     app.log.info('✅ MongoDB connection established');
+
+    app.get('/secure', { preHandler: adminAuth }, async () => {
+    return { message: 'Secure route accessed ✅' };
+    });
 
     // Health check route
     app.get('/health', async () => {
