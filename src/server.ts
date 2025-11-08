@@ -4,10 +4,11 @@ import { connectDB } from './config/db';
 import { adminAuth } from './middleware/auth';
 import uploadRoutes from './routes/uploads';
 import multipart from '@fastify/multipart';
+import { startCleanupJob } from './jobs/cleanupJob';
 
 async function startServer() {
   try {
-    // ✅ Fastify logger config (v5 style)
+    // Fastify logger config (v5 style)
     const app = Fastify({
       logger: {
         level: process.env.LOG_LEVEL || 'info',
@@ -19,10 +20,12 @@ async function startServer() {
     });
     // Connect to MongoDB
     await connectDB();
-    app.log.info('✅ MongoDB connection established');
+    app.log.info('MongoDB connection established');
+
+    startCleanupJob(app.log);
 
     app.get('/secure', { preHandler: adminAuth }, async () => {
-    return { message: 'Secure route accessed ✅' };
+    return { message: 'Secure route accessed' };
     });
 
     await app.register(multipart);
@@ -38,9 +41,9 @@ async function startServer() {
     const PORT = process.env.PORT || 3000;
     await app.listen({ port: Number(PORT), host: '0.0.0.0' });
 
-    app.log.info(`🚀 Server running at http://localhost:${PORT}`);
+    app.log.info(`Server running at http://localhost:${PORT}`);
   } catch (err) {
-    console.error('❌ Server startup failed:', err);
+    console.error('Server startup failed:', err);
     process.exit(1);
   }
 }

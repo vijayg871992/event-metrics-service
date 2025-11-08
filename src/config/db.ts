@@ -14,9 +14,9 @@ export async function connectDB() {
   });
 
   mongoose.connection.on('connected', () =>
-    console.log('✅ MongoDB connected to cluster:', mongoose.connection.name)
+    console.log('MongoDB connected to cluster:', mongoose.connection.name)
   );
   mongoose.connection.on('error', (err) =>
-    console.error('❌ MongoDB connection error:', err)
+    console.error('MongoDB connection error:', err)
   );
 }
