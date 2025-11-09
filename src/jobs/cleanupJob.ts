@@ -1,39 +1,40 @@
 import { EventModel } from '../models/Event';
+import { BatchModel } from '../models/Batch';
 import dotenv from 'dotenv';
 dotenv.config();
 
-/**
- * 1. Cleanup runs at every server start and every 1 hour (editable)
- * 2. Events deleted after CLEANUP_TTL_SECONDS -> 5s to 24h
- */
-
 export function startCleanupJob(appLog?: { info: Function; error: Function }) {
+  const ttl = Number(process.env.CLEANUP_TTL_SECONDS || 86400);
+  const interval = Number(process.env.CLEANUP_INTERVAL_SECONDS || 3600);
 
-  const ttlSeconds = Number(process.env.CLEANUP_TTL_SECONDS); 
-  const intervalMs = Number(process.env.CLEANUP_INTERVAL_SECONDS); 
-
-  const logInfo = (msg: string) => (appLog?.info ? appLog.info(msg) : console.log(msg));
-  const logError = (msg: string, err?: any) =>
-    appLog?.error ? appLog.error(msg, err) : console.error(msg, err);
-
-  const runCleanup = async (label = 'scheduled') => {
-    const cutoff = new Date(Date.now() - ttlSeconds * 1000);
+  async function cleanup() {
     try {
-      const res = await EventModel.deleteMany({
+      const cutoff = new Date(Date.now() - ttl * 1000);
+
+      // Step 1: Delete unprocessed old events
+      const result = await EventModel.deleteMany({
         processed: false,
         created_at: { $lt: cutoff },
       });
-      logInfo(
-        `Cleanup (${label}): deleted ${res.deletedCount ?? 0} unprocessed events older than ${ttlSeconds}s`
+      appLog?.info(
+        `Cleanup: deleted ${result.deletedCount} unprocessed events older than ${ttl}s`
       );
-    } catch (err) {
-      logError('Cleanup error during ' + label, err);
+
+      // ✅ Step 2: Delete old batches (simple, clean)
+      const batchResult = await BatchModel.deleteMany({
+        status: 'uploaded',  
+        created_at: { $lt: cutoff },
+      });
+      appLog?.info(
+        `Cleanup: deleted ${batchResult.deletedCount} old batches older than ${ttl}s`
+      );
+
+    } catch (err: any) {
+      appLog?.error('Cleanup job failed:', err);
     }
-  };
+  }
 
-  //Cleanup at start
-  runCleanup('startup');
-
-  // Scheduled cleanup 
-  setInterval(() => runCleanup(), intervalMs*1000);
+  // Run once at startup + interval
+  cleanup();
+  setInterval(cleanup, interval * 1000);
 }

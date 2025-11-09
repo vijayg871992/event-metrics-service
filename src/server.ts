@@ -1,10 +1,11 @@
 import Fastify from 'fastify';
-import pino from 'pino';
+import './config/redis';
 import { connectDB } from './config/db';
 import { adminAuth } from './middleware/auth';
 import uploadRoutes from './routes/uploads';
 import multipart from '@fastify/multipart';
 import { startCleanupJob } from './jobs/cleanupJob';
+import batchProcessRoutes from './routes/batchProcessRoutes';
 
 async function startServer() {
   try {
@@ -29,6 +30,8 @@ async function startServer() {
     });
 
     await app.register(multipart);
+
+    await app.register(batchProcessRoutes);
     
     app.register(uploadRoutes, { prefix: '/uploads' });
 
