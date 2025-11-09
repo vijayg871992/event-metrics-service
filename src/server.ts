@@ -5,6 +5,7 @@ import { adminAuth } from './middleware/auth';
 import uploadRoutes from './routes/uploads';
 import multipart from '@fastify/multipart';
 import { startCleanupJob } from './jobs/cleanupJob';
+import { startEventJob } from './jobs/eventJob';
 import batchProcessRoutes from './routes/batchProcessRoutes';
 
 async function startServer() {
@@ -23,7 +24,9 @@ async function startServer() {
     await connectDB();
     app.log.info('MongoDB connection established');
 
+    //Jobs - Worker functions
     startCleanupJob(app.log);
+    startEventJob(app.log);
 
     app.get('/secure', { preHandler: adminAuth }, async () => {
     return { message: 'Secure route accessed' };

@@ -23,7 +23,14 @@ export async function processBatch(
     }
 
     //Push job to BullMQ queue
-    await eventQueue.add('process-batch', { batchId: id });
+    await eventQueue.add(
+      'process-batch',
+      { batchId: id },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+      }
+    );
 
     //Update status to queued
     batch.status = 'queued';

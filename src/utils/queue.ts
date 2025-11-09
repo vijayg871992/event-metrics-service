@@ -3,6 +3,6 @@ import IORedis from 'ioredis';
 
 const connection = new IORedis({ maxRetriesPerRequest: null }); 
 
-export const eventQueue = new Queue('event‐processing', {
+export const eventQueue = new Queue('event-processing', {
   connection,
 });
