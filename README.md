@@ -1,6 +1,6 @@
 # Event Metrics Service
 
-A Node.js service that processes CSV event uploads, computes daily metrics, and provides query APIs.
+A Node.js service that processes CSV event uploads, computes daily metrics, and provides query APIs built by refering to official docs and public github repo's mentioned at the end of file.
 
 ## Tech Stack
 
@@ -166,5 +166,37 @@ npm test
 - Upload rate limiting (1/min per IP)
 
 ---
+
+### References & Documentation Used
+
+1. **Fastify + TypeScript Setup**  
+   - [GitHub Repo](https://github.com/raviroshanmehta/fastify-typescript-mongoose)  
+   - Used for server initialization, MongoDB plugin, and `tsconfig.json` reference.
+
+2. **MongoDB with TypeScript**  
+   - [Official Tutorial](https://www.mongodb.com/resources/products/compatibilities/using-typescript-with-mongodb-tutorial)  
+   - Helped configure TypeScript-compatible MongoDB connections.
+
+3. **Fastify Logging (Pino Integration)**  
+   - [Fastify Logging Docs](https://fastify.dev/docs/latest/Reference/Logging/)  
+   - [Pino Pretty GitHub](https://github.com/pinojs/pino-pretty)  
+   - Fixed logger configuration issue (“logger options only accepts a configuration object”).
+
+4. **BullMQ Job Queue & Workers**  
+   - [BullMQ Official Docs](https://bullmq.io/)  
+   - [BetterStack Guide](https://betterstack.com/community/guides/scaling-nodejs/bullmq-scheduled-tasks/)  
+   - [Dev.to Reference](https://dev.to/roshan_ican/handling-multiple-requests-with-redis-and-bullmq-13pa)  
+   - Used for repeatable jobs, retries, and DLQ handling.
+
+5. **Redis via Docker**  
+   - [Redis Docker Hub](https://hub.docker.com/_/redis)  
+   - Commands: `docker run -p 6379:6379 redis:7`, `docker exec -it redis redis-cli`, `ping → pong`.
+
+6. **Testing Frameworks**  
+   - [Fastify Testing Guide](https://fastify.dev/docs/latest/Guides/Testing/)  
+   - [Jest Docs](https://jestjs.io/docs/getting-started)  
+   - [mongodb-memory-server](https://github.com/nodkz/mongodb-memory-server)  
+   - Used for integration testing and in-memory database verification.
+
 
 Built using Node.js, TypeScript, and Fastify
