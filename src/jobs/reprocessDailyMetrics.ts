@@ -24,7 +24,7 @@ export function startReprocessDailyMetricsJob(appLog?: { info: Function; error: 
       const metricsMap: Record<string, Record<string, number>> = {};
 
       for (const e of events) {
-        const date = new Date(e.timestamp).toISOString().split('T')[1];
+        const date = new Date(e.timestamp).toISOString().split('T')[0];
         const type = e.event_type;
 
         if (!metricsMap[date]) metricsMap[date] = {};

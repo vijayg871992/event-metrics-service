@@ -10,8 +10,8 @@ import { startCleanupJob } from "./jobs/cleanupJob";
 import { startEventJob } from "./jobs/eventJob";
 import batchProcessRoutes from "./routes/batchProcessRoutes";
 import metricsRoutes from "./routes/metrics";
-import { startReprocessDailyMetricsJob } from './jobs/reprocessDailyMetrics';
-import queueAdminRoutes from './routes/queue';
+import { startReprocessDailyMetricsJob } from "./jobs/reprocessDailyMetrics";
+import queueAdminRoutes from "./routes/queue";
 
 async function startServer() {
   try {
@@ -49,7 +49,7 @@ async function startServer() {
 
     app.register(uploadRoutes, { prefix: "/uploads" });
 
-    app.register(queueAdminRoutes, { prefix: '/admin' });
+    app.register(queueAdminRoutes, { prefix: "/admin" });
 
     // Health check route
     app.get("/health", async () => {
