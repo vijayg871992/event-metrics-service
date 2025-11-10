@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const redisUrl = process.env.REDIS_URL as string; 
-export const connection = new IORedis(redisUrl);
+export const connection = new IORedis(redisUrl, {
+  maxRetriesPerRequest: null
+});
 
 connection.on('connect', () => {
   console.log('Redis connected successfully at', redisUrl);

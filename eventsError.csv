@@ -1,0 +1,9 @@
+candidate_id,test_id,event_type
+C101,T1001,test_started
+C101,T1001,question_answered
+C101,T1001,test_completed
+C102,T1002,test_started
+C102,T1002,test_abandoned
+,T1002,test_abandoned
+C102,T1002,
+C102,T1002,test_abandoned

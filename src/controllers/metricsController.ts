@@ -13,7 +13,20 @@ export async function getMetrics(request: FastifyRequest, reply: FastifyReply) {
     let filter: any = {};
 
     if (date) filter.date = date;
-    else if (from && to) filter.date = { $gte: from, $lte: to };
+    //else if (from && to) filter.date = { $gte: from, $lte: to };
+    else if (from && to) {
+      // Normalize dates to YYYY-MM-DD format with zero-padding
+      const fromDate = new Date(from).toISOString().split("T")[0];
+      const toDate = new Date(to).toISOString().split("T")[0];
+      filter.date = { $gte: fromDate, $lte: toDate };
+    } 
+
+    else if (from) {
+      // Normalize dates to YYYY-MM-DD format with zero-padding
+      const fromDate = new Date(from).toISOString().split("T")[0];
+      filter.date = { $gte: fromDate };
+    }
+    
     else if (event_type) filter["metrics.event_type"] = event_type;
 
     const metrics = await DailyMetricsModel.find(filter).sort({ date: 1 });

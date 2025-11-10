@@ -14,6 +14,7 @@ export function startEventJob(appLog?: { info: Function; error: Function }) {
   const worker = new Worker(
     'event-processing',
     async (job: Job) => {
+      //throw new Error('Testing DLQ');
       const { batchId } = job.data;
       appLog?.info(`Processing batch: ${batchId}`);
 

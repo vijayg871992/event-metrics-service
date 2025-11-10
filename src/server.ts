@@ -10,6 +10,8 @@ import { startCleanupJob } from "./jobs/cleanupJob";
 import { startEventJob } from "./jobs/eventJob";
 import batchProcessRoutes from "./routes/batchProcessRoutes";
 import metricsRoutes from "./routes/metrics";
+import { startReprocessDailyMetricsJob } from './jobs/reprocessDailyMetrics';
+import queueAdminRoutes from './routes/queue';
 
 async function startServer() {
   try {
@@ -47,6 +49,8 @@ async function startServer() {
 
     app.register(uploadRoutes, { prefix: "/uploads" });
 
+    app.register(queueAdminRoutes, { prefix: '/admin' });
+
     // Health check route
     app.get("/health", async () => {
       return { status: "ok", uptime: process.uptime() };
@@ -62,5 +66,10 @@ async function startServer() {
     process.exit(1);
   }
 }
+
+startReprocessDailyMetricsJob({
+  info: console.log,
+  error: console.error,
+});
 
 startServer();

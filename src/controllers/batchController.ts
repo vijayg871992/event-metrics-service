@@ -27,6 +27,7 @@ export async function processBatch(
       'process-batch',
       { batchId: id },
       {
+        jobId: id,
         attempts: 3,
         backoff: { type: 'exponential', delay: 5000 },
       }
