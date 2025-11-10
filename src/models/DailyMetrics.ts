@@ -27,4 +27,7 @@ DailyMetricsSchema.pre('save', function (next) {
   next();
 });
 
+DailyMetricsSchema.index({ date: 1 }, { unique: true });
+DailyMetricsSchema.index({ date: 1, 'metrics.event_type': 1 });
+
 export const DailyMetricsModel = mongoose.model<IDailyMetrics>( 'DailyMetrics', DailyMetricsSchema );

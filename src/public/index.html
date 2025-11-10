@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Testlify Dashboard</title>
+  </head>
+  <body>
+    <h2>Testlify Dashboard</h2>
+
+    <h3>Upload CSV</h3>
+    <input type="file" id="csvFile" />
+    <button onclick="uploadCSV()">Upload</button>
+
+    <h3>Reprocess Batches</h3>
+    <button onclick="reprocess()">Reprocess</button>
+
+    <h3>View Metrics</h3>
+    <input
+      type="text"
+      id="query"
+      placeholder="?date=YYYY-MM-DD or ?from=YYYY-MM-DD&to=YYYY-MM-DD"
+    />
+    <button onclick="viewMetrics()">Fetch</button>
+
+    <pre id="output"></pre>
+
+    <script>
+      const base = "http://localhost:3000";
+      const token = "SuperSecret123";
+
+      function showResponse(resText) {
+        const output = document.getElementById("output");
+        output.innerHTML = "";
+
+        try {
+          const json = JSON.parse(resText);
+
+          //Upload response (errors)
+          if (json.errors && Array.isArray(json.errors)) {
+            const summary = document.createElement("div");
+            summary.innerHTML = `<b>Batch ID:</b> ${json.batch_id} <b>Inserted:</b> ${json.inserted_count} <b>Failed:</b> ${json.failed_count}`;
+            output.appendChild(summary);
+
+            let table = '<table border="1" cellpadding="4"><tr>';
+            const keys = Object.keys(json.errors[0]);
+            table += keys.map((k) => `<th>${k}</th>`).join("") + "</tr>";
+            json.errors.forEach((err) => {
+              table +=
+                "<tr>" +
+                keys.map((k) => `<td>${err[k] || ""}</td>`).join("") +
+                "</tr>";
+            });
+            table += "</table>";
+            output.innerHTML += table;
+          }
+
+          //Metrics response (data)
+          else if (json.data && Array.isArray(json.data)) {
+            let table =
+              '<table border="1" cellpadding="4"><tr><th>Date</th><th>Event Type</th><th>Count</th></tr>';
+            json.data.forEach((day) => {
+              day.metrics.forEach((m) => {
+                table += `<tr>
+                      <td>${day.date}</td>
+                      <td>${m.event_type}</td>
+                      <td>${m.count}</td>
+                    </tr>`;
+              });
+            });
+            table += "</table>";
+            output.innerHTML = table;
+          }
+
+          //Default case (plain JSON or text)
+          else {
+            output.textContent = JSON.stringify(json, null, 2);
+          }
+        } catch {
+          output.textContent = resText;
+        }
+      }
+
+      //  Reusable request helper
+      async function request(url, options = {}) {
+        const res = await fetch(url, {
+          ...options,
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        showResponse(await res.text());
+      }
+
+      // Upload CSV
+      async function uploadCSV() {
+        const file = document.getElementById("csvFile").files[0];
+        if (!file) return alert("Select a file");
+        const form = new FormData();
+        form.append("file", file);
+        await request(`${base}/uploads`, { method: "POST", body: form });
+      }
+
+      // Reprocess Batch
+      async function reprocess() {
+        const batchId = prompt("Enter Batch ID to reprocess:");
+        if (!batchId) return alert("Batch ID is required");
+        await request(`${base}/batches/${batchId}/process`, { method: "POST" });
+      }
+
+      // View Metrics
+      async function viewMetrics() {
+        const q = document.getElementById("query").value;
+        await request(`${base}/metrics${q}`);
+      }
+    </script>
+  </body>
+</html>
